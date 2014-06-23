@@ -1,10 +1,10 @@
 {
-	"name": "naonaox1126/vizualizer_address",
-	"description": "Address Extension for Vizualizer",
+	"name": "naonaox1126/vizualizer_shortage",
+	"description": "Short URL Extension for Vizualizer",
 	"keywords": ["PHP", "Framework", "MySQL", "Extension"],
 	"type": "framework",
 	"license": "Apache-2.0",
-	"homepage": "https://github.com/NAONAOx1126/VizualizerAddress",
+	"homepage": "https://github.com/NAONAOx1126/VizualizerShortage",
 	"authors": [
 		{
 			"name": "NAONAOx1126",
@@ -15,6 +15,6 @@
     	"php": ">=5.3.0"
     },
     "autoload": {
-    	"psr-0": { "VizualizerAddress": "classes" }
+    	"psr-0": { "VizualizerShortage": "classes" }
     }
 }
