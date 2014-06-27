@@ -30,6 +30,7 @@
  */
 class VizualizerShortage_Model_Url extends Vizualizer_Plugin_Model
 {
+    private static $counts;
 
     /**
      * コンストラクタ
@@ -59,5 +60,32 @@ class VizualizerShortage_Model_Url extends Vizualizer_Plugin_Model
             $code = $url_code;
         }
         $this->findBy(array("url_code" => $code));
+    }
+
+    protected function getClickCounts(){
+        if(!is_array(self::$counts)){
+            $select->addColumn($url->url_code, "url_code");
+            $select->addGroupBy($url->url_code)->addOrder($url->url_code);
+            $select->addColumn("COUNT(".$log->click_log_id.")", "total");
+            $select->addColumn("SUM(CASE WHEN ".$log->click_type." = 1 THEN 1 ELSE 0 END)", "pc");
+            $select->addColumn("SUM(CASE WHEN ".$log->click_type." = 2 THEN 1 ELSE 0 END)", "sp");
+            $select->addColumn("SUM(CASE WHEN ".$log->click_type." = 3 THEN 1 ELSE 0 END)", "mb");
+            $select->join($url, array($log->url_id." = ".$url->url_id));
+            $select->addWhere($url->operator_id." = ?", array($attr[VizualizerAdmin::KEY]->operator_id));
+            $clickLogs = $clickLog->queryAllBy($select);
+            self::$counts = array();
+            foreach($clickLogs as $log){
+                self::$counts[$log->url_code] = array("total" => $log->total, "pc" => $log->pc, "sp" => $log->sp, "mb" => $log->mb);
+            }
+        }
+        return self::$counts;
+    }
+
+    public function calcClickCounts() {
+        $counts = $this->getClickCounts();
+        $this->total_count = $counts[$this->url_code]["total"];
+        $this->pc_count = $counts[$this->url_code]["pc"];
+        $this->sp_count = $counts[$this->url_code]["sp"];
+        $this->mb_count = $counts[$this->url_code]["mb"];
     }
 }
