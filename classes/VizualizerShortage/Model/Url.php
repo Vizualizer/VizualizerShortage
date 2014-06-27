@@ -64,6 +64,12 @@ class VizualizerShortage_Model_Url extends Vizualizer_Plugin_Model
 
     protected function getClickCounts(){
         if(!is_array(self::$counts)){
+            $attr = Vizualizer::attr();
+            $loader = new Vizualizer_Plugin("shortage");
+            $clickLog = $loader->loadModel("ClickLog");
+            $log = $loader->loadTable("ClickLogs");
+            $url = $loader->loadTable("Urls");
+            $select = new Vizualizer_Query_Select($log);
             $select->addColumn($url->url_code, "url_code");
             $select->addGroupBy($url->url_code)->addOrder($url->url_code);
             $select->addColumn("COUNT(".$log->click_log_id.")", "total");
