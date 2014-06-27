@@ -89,9 +89,16 @@ class VizualizerShortage_Model_Url extends Vizualizer_Plugin_Model
 
     public function calcClickCounts() {
         $counts = $this->getClickCounts();
-        $this->total_count = $counts[$this->url_code]["total"];
-        $this->pc_count = $counts[$this->url_code]["pc"];
-        $this->sp_count = $counts[$this->url_code]["sp"];
-        $this->mb_count = $counts[$this->url_code]["mb"];
+        if(isset($counts[$this->url_code])){
+            $this->total_count = $counts[$this->url_code]["total"];
+            $this->pc_count = $counts[$this->url_code]["pc"];
+            $this->sp_count = $counts[$this->url_code]["sp"];
+            $this->mb_count = $counts[$this->url_code]["mb"];
+        }else{
+            $this->total_count = 0;
+            $this->pc_count = 0;
+            $this->sp_count = 0;
+            $this->mb_count = 0;
+        }
     }
 }
