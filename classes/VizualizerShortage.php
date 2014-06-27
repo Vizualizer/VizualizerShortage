@@ -80,15 +80,19 @@ class VizualizerShortage
                 $clickLog->referer = $_SERVER["HTTP_REFERER"];
                 $clickLog->user_agent = $_SERVER["HTTP_USER_AGENT"];
                 $clickLog->ip_address = $_SERVER["REMOTE_ADDR"];
+                $redirectUrl = $url->pc_url;
                 if(Vizualizer_Configure::get("device")->isFuturePhone()){
                     $clickLog->click_type = 3;
-                    header("Location: ".$url->mb_url);
+                    if($url->mb_url){
+                        $redirectUrl = $url->mb_url;
+                    }
                 }elseif(Vizualizer_Configure::get("device")->isSmartPhone()){
                     $clickLog->click_type = 2;
-                    header("Location: ".$url->sp_url);
+                    if($url->sp_url){
+                        $redirectUrl = $url->sp_url;
+                    }
                 }else{
                     $clickLog->click_type = 1;
-                    header("Location: ".$url->pc_url);
                 }
                 // トランザクションの開始
                 $connection = Vizualizer_Database_Factory::begin("shortage");
@@ -101,6 +105,17 @@ class VizualizerShortage
                     Vizualizer_Logger::writeInfo("Skipped save Click Log");
                     Vizualizer_Logger::writeInfo(print_r($clickLog->toArray()));
                 }
+                ob_end_clean();
+                echo "<html>";
+                echo "<head>";
+                echo "<meta http-equiv=\"refresh\" content = \"0; url=".$redirectUrl."\" >";
+                echo "<meta name=\"robots\" content=\"noindex,noarchive\" />";
+                echo "</head>";
+                echo "<body>";
+                echo "<!--以下にSSのCVタグ、リタゲタグ、アクセス解析タグ、ASPのクリエイティブ名など-->";
+                echo $url->custom_tag;
+                echo "</body>";
+                echo "</html>";
                 exit;
             }
         }
