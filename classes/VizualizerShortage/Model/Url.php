@@ -72,7 +72,6 @@ class VizualizerShortage_Model_Url extends Vizualizer_Plugin_Model
             $select->addColumn("SUM(CASE WHEN ".$log->click_type." = 3 THEN 1 ELSE 0 END)", "mb");
             $select->join($url, array($log->url_id." = ".$url->url_id));
             $select->addWhere($url->operator_id." = ?", array($attr[VizualizerAdmin::KEY]->operator_id));
-            $select->addWhere($log->create_time." LIKE ?", array($year."-".$month."-".$day." %"));
             $clickLogs = $clickLog->queryAllBy($select);
             self::$counts = array();
             foreach($clickLogs as $log){
