@@ -70,6 +70,8 @@ class VizualizerShortage
         if(Vizualizer_Configure::get("shorturl_ignore_subdir")){
             $codeUrl = $baseUrl . ((!empty($baseUrl) && !empty($codeUrl))?"/":"") . $codeUrl;
             $baseUrl = "";
+        }else{
+            Vizualizer_Configure::set("shorturl_ignore_subdir", false);
         }
 
         // 短縮URLの対象ユーザーを取得
