@@ -47,7 +47,7 @@ class VizualizerShortage
     final public static function prefilter(){
         // 呼び出されたURLを取得
         $attr = Vizualizer::attr();
-        $info = pathinfo($attr["templateName"]);
+        $info = pathinfo(str_replace(VIZUALIZER_SUBDIR."/", "", str_replace("?".$_SERVER["QUERY_STRING"], "", $_SERVER["REQUEST_URI"])));
 
         // URLをパース
         $baseUrl = substr($info["dirname"], 1);
@@ -61,7 +61,11 @@ class VizualizerShortage
         $loader = new Vizualizer_Plugin("Admin");
         $operator = $loader->loadModel("CompanyOperator");
         $operator->findBy(array("url" => $baseUrl));
-
+        if(!($operator->operator_id > 0)){
+            $operator->findBy(array("url" => "link"));
+            $codeUrl = $baseUrl . ((!empty($baseUrl) && !empty($codeUrl))?"/":"") . $codeUrl;
+            $baseUrl = "";
+        }
         // 短縮URLを取得
         if($operator->operator_id > 0){
             $loader = new Vizualizer_Plugin("Shortage");
