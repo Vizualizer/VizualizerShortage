@@ -47,21 +47,46 @@ class VizualizerShortage
     final public static function prefilter(){
         // 呼び出されたURLを取得
         $attr = Vizualizer::attr();
-        $info = pathinfo($attr["templateName"]);
+        $info = pathinfo(str_replace(VIZUALIZER_SUBDIR."/", "", str_replace("?".$_SERVER["QUERY_STRING"], "", $_SERVER["REQUEST_URI"])));
 
         // URLをパース
-        $baseUrl = substr($info["dirname"], 1);
+        $baseUrl = "";
+        if(array_key_exists("dirname", $info)){
+            if($info["dirname"] == "."){
+                $baseUrl = "";
+            }elseif(substr($info["dirname"], 0, 2) == "./"){
+                $baseUrl = substr($info["dirname"], 2);
+            }elseif(substr($info["dirname"], 0, 1) == "/"){
+                $baseUrl = substr($info["dirname"], 1);
+            }else{
+                $baseUrl = $info["dirname"];
+            }
+        }
         if(strpos($baseUrl, "/") > 0 && $info["basename"] == "index.html"){
             list($baseUrl, $codeUrl) = explode("/", $baseUrl, 2);
         }else{
             $codeUrl = $info["filename"];
         }
+        if(Vizualizer_Configure::get("shorturl_ignore_subdir")){
+            $codeUrl = $baseUrl . ((!empty($baseUrl) && !empty($codeUrl))?"/":"") . $codeUrl;
+            $baseUrl = "";
+        }else{
+            Vizualizer_Configure::set("shorturl_ignore_subdir", false);
+        }
 
         // 短縮URLの対象ユーザーを取得
         $loader = new Vizualizer_Plugin("Admin");
         $operator = $loader->loadModel("CompanyOperator");
-        $operator->findBy(array("url" => $baseUrl));
-
+        if(Vizualizer_Configure::get("shorturl_ignore_subdir")){
+            $operator->findBy(array());
+        }else{
+            $operator->findBy(array("url" => $baseUrl));
+        }
+        if(!($operator->operator_id > 0)){
+            $operator->findBy(array("url" => ""));
+            $codeUrl = $baseUrl . ((!empty($baseUrl) && !empty($codeUrl))?"/":"") . $codeUrl;
+            $baseUrl = "";
+        }
         // 短縮URLを取得
         if($operator->operator_id > 0){
             $loader = new Vizualizer_Plugin("Shortage");
