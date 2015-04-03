@@ -45,9 +45,11 @@ class VizualizerShortage_Module_ClickLog_Summery extends Vizualizer_Plugin_Modul
         if(preg_match("/^([0-9]{4})-?([0-9]{2})$/", $post["ym"], $p) == 0){
             $post["ym"] = date("Ym");
         }
+        /*
         if(preg_match("/^[0-9]{1,2}$/", $post["d"]) == 0 && empty($post["k"])){
             $post["d"] = date("d");
         }
+        */
 
         // 集計処理を実行
         if(preg_match("/^([0-9]{4})-?([0-9]{2})$/", $post["ym"], $p) > 0){
@@ -107,7 +109,22 @@ class VizualizerShortage_Module_ClickLog_Summery extends Vizualizer_Plugin_Modul
                 $select->addWhere($url->url_code." = ?", array($kw));
                 $clickLogs = $clickLog->queryAllBy($select);
             }else{
-                throw new Vizualizer_Exception_Invalid("op", "追加の条件が指定されていません");
+                // 月別サマリ
+                if($post["ext"] == "1"){
+                    $select->addColumn($log->url_code, "url_code");
+                    $select->addGroupBy($log->url_code)->addOrder($log->url_code);
+                }else{
+                    $select->addColumn($url->url_code, "url_code");
+                    $select->addGroupBy($url->url_code)->addOrder($url->url_code);
+                }
+                $select->addColumn("COUNT(".$log->click_log_id.")", "total");
+                $select->addColumn("SUM(CASE WHEN ".$log->click_type." = 1 THEN 1 ELSE 0 END)", "pc");
+                $select->addColumn("SUM(CASE WHEN ".$log->click_type." = 2 THEN 1 ELSE 0 END)", "sp");
+                $select->addColumn("SUM(CASE WHEN ".$log->click_type." = 3 THEN 1 ELSE 0 END)", "mb");
+                $select->join($url, array($log->url_id." = ".$url->url_id));
+                $select->addWhere($url->operator_id." = ?", array($attr[VizualizerAdmin::KEY]->operator_id));
+                $select->addWhere($log->create_time." LIKE ?", array($year."-".$month."-%"));
+                $clickLogs = $clickLog->queryAllBy($select);
             }
         }else{
             throw new Vizualizer_Exception_Invalid("ym", "年月の指定が正しくありません");
