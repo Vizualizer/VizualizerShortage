@@ -59,7 +59,7 @@ class VizualizerShortage_Module_ClickLog_Summery extends Vizualizer_Plugin_Modul
             $attr["prevYm"] = date("Ym", strtotime("-1 month", strtotime($year."-".$month."-01")));
             $attr["nextYm"] = date("Ym", strtotime("+1 month", strtotime($year."-".$month."-01")));
             $dates = array();
-            for($i = 1; $i <= date("t", strtotime("-1 month", strtotime($year."-".$month."-01"))); $i ++){
+            for($i = 1; $i <= date("t", strtotime($year."-".$month."-01")); $i ++){
                 $dates[] = $i;
             }
             $attr["dates"] = $dates;
