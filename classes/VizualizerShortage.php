@@ -47,7 +47,13 @@ class VizualizerShortage
     final public static function prefilter(){
         // 呼び出されたURLを取得
         $attr = Vizualizer::attr();
-        $info = pathinfo(str_replace(VIZUALIZER_SUBDIR."/", "", str_replace("?".$_SERVER["QUERY_STRING"], "", $_SERVER["REQUEST_URI"])));
+        $path = str_replace("?".$_SERVER["QUERY_STRING"], "", $_SERVER["REQUEST_URI"]);
+        if (VIZUALIZER_SUBDIR != "") {
+            if (strpos($path, VIZUALIZER_SUBDIR) === 0) {
+                $path = substr($path, strlen(VIZUALIZER_SUBDIR));
+            }
+        }
+        $info = pathinfo($path);
 
         // URLをパース
         $baseUrl = "";
